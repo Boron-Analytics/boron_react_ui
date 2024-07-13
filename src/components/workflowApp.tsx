@@ -8,6 +8,7 @@ import CustomNode from './CustomNode';
 import ConfigPanel from './ConfigPanel';
 import AppBar from './AppBar';
 import NodeToolbar from './NodeToolbar';
+import { Edge } from 'react-flow-renderer';
 
 const nodeTypes = {
   customNode: CustomNode,
@@ -114,16 +115,26 @@ const WorkflowApp: React.FC = () => {
     }));
   }, [nodes, onControlChange]);
 
-  function addEdge(params: Connection, eds: import("reactflow").Edge<any>[]): import("reactflow").Edge<any>[] {
-    throw new Error('Function not implemented.');
-  }
+   const onConnect = useCallback((params: Connection) => {
+    setEdges((eds) => addEdge(params, eds));
+  }, [setEdges]);
+
+  const addEdge = (params: any, edges: Edge[]) => {
+    const newEdge = {
+      id: `e${params.source}-${params.target}`,
+      source: params.source,
+      target: params.target
+    };
+    return [...edges, newEdge];
+  };
+
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen">
       <AppBar onSave={onSave} onLoad={onLoad} />
       <div className="flex-1 flex">
         <NodeToolbar onAddNode={onAddNode} />
-        <div className="flex-1">
+        <div className="flex-1" style={{ height: 800 }}>
           <ReactFlow
             nodes={nodesWithOnChange}
             edges={edges}

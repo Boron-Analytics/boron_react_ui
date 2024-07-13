@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { NodeData } from '../types';
+import { Card } from 'primereact/card';
 
 const CustomNode: React.FC<NodeProps<NodeData>> = ({ data, isConnectable }) => {
   const renderControl = (control: NodeData['controls'][0], index: number) => {
@@ -74,9 +75,8 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ data, isConnectable }) => {
   };
 
   return (
-    <div className="p-4 border rounded-lg bg-white shadow-md">
+    <Card className="custom-node" title={data.label}>
       <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
-      <div className="font-bold mb-2">{data.label}</div>
       {data.controls.map((control, index) => (
         <div key={index} className="mb-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -86,7 +86,7 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ data, isConnectable }) => {
         </div>
       ))}
       <Handle type="source" position={Position.Bottom} isConnectable={isConnectable} />
-    </div>
+    </Card>
   );
 };
 

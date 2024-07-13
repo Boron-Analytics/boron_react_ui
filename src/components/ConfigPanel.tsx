@@ -1,7 +1,12 @@
 import React from 'react';
 import { Node } from 'reactflow';
 import { CustomNodeData, ControlConfig } from '../types';
-import { Trash2 } from 'lucide-react'; // Import the trash icon
+import { InputText } from 'primereact/inputtext';
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
+import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox';
+import { Button } from 'primereact/button';
+import { Panel } from 'primereact/panel';
+import { Divider } from 'primereact/divider';
 
 interface ConfigPanelProps {
   selectedNode: Node<CustomNodeData> | null;
@@ -12,9 +17,9 @@ interface ConfigPanelProps {
 const ConfigPanel: React.FC<ConfigPanelProps> = ({ selectedNode, onUpdateNode, onDeleteNode }) => {
   if (!selectedNode) {
     return (
-      <div className="w-80 bg-gray-100 p-4 border-l border-gray-300">
-        <p className="text-gray-500">Select a node to configure</p>
-      </div>
+      <Panel header="Configuration" className="config-panel">
+        <p className="p-text-secondary">Select a node to configure</p>
+      </Panel>
     );
   }
 
@@ -34,80 +39,66 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ selectedNode, onUpdateNode, o
 
   const renderControlConfig = (control: ControlConfig, index: number) => {
     return (
-      <div key={index} className="mb-4 p-4 bg-white rounded shadow">
-        <div className="mb-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Label
-          </label>
-          <input
-            type="text"
-            className="w-full px-2 py-1 border rounded focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
-            value={control.label}
-            onChange={(e) => handleLabelChange(index, e.target.value)}
+      <div key={index} className="p-field">
+        <label htmlFor={`control-label-${index}`} className="p-d-block">Label</label>
+        <InputText
+          id={`control-label-${index}`}
+          value={control.label}
+          onChange={(e) => handleLabelChange(index, e.target.value)}
+          className="p-d-block"
+        />
+        <label htmlFor={`control-value-${index}`} className="p-d-block">Value</label>
+        {control.type === 'checkbox' ? (
+          <Checkbox
+            inputId={`control-value-${index}`}
+            checked={control.value as boolean}
+            onChange={(e: CheckboxChangeEvent) => {
+              if (e.checked !== undefined) {
+                handleValueChange(index, e.checked);
+              }
+            }}
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Value
-          </label>
-          {control.type === 'checkbox' ? (
-            <input
-              type="checkbox"
-              checked={control.value as boolean}
-              onChange={(e) => handleValueChange(index, e.target.checked)}
-              className="form-checkbox text-primary focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
-            />
-          ) : control.type === 'dropdown' ? (
-            <select
-              className="w-full px-2 py-1 border rounded focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
-              value={control.value as string}
-              onChange={(e) => handleValueChange(index, e.target.value)}
-            >
-              {control.options?.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              type="text"
-              className="w-full px-2 py-1 border rounded focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
-              value={control.value as string}
-              onChange={(e) => handleValueChange(index, e.target.value)}
-            />
-          )}
-        </div>
+        ) : control.type === 'dropdown' ? (
+          <Dropdown
+            id={`control-value-${index}`}
+            value={control.value as string}
+            options={control.options}
+            onChange={(e: DropdownChangeEvent) => handleValueChange(index, e.value)}
+            className="p-d-block"
+          />
+        ) : (
+          <InputText
+            id={`control-value-${index}`}
+            value={control.value as string}
+            onChange={(e) => handleValueChange(index, e.target.value)}
+            className="p-d-block"
+          />
+        )}
+        <Divider />
       </div>
     );
   };
 
   return (
-    <div className="w-80 bg-gray-100 p-4 border-l border-gray-300 overflow-y-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-primary">Node Configuration</h2>
-        <button
-          onClick={() => onDeleteNode(selectedNode.id)}
-          className="text-red-500 hover:text-red-700 focus:outline-none"
-          title="Delete Node"
-        >
-          <Trash2 size={20} />
-        </button>
-      </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Node Label
-        </label>
-        <input
-          type="text"
-          className="w-full px-2 py-1 border rounded focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+    <Panel header="Node Configuration" className="config-panel p-shadow-2">
+      <div className="p-d-flex p-jc-between p-ai-center p-mb-3">
+        <InputText
           value={selectedNode.data.label}
           onChange={(e) => onUpdateNode(selectedNode.id, { ...selectedNode.data, label: e.target.value })}
+          placeholder="Node Label"
+          className="p-mr-2"
+        />
+        <Button
+          icon="pi pi-trash"
+          className="p-button-danger p-button-rounded"
+          onClick={() => onDeleteNode(selectedNode.id)}
+          tooltip="Delete Node"
         />
       </div>
-      <h3 className="text-md font-semibold mb-2 text-primary">Controls</h3>
+      <Divider />
+      <h3 className="p-text-secondary p-mb-2">Controls</h3>
       {selectedNode.data.controls.map(renderControlConfig)}
-    </div>
+    </Panel>
   );
 };
 

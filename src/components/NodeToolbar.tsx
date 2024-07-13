@@ -1,28 +1,45 @@
 import React from 'react';
 import { ControlType } from '../types';
+import { Button } from 'primereact/button';
+import { Card } from 'primereact/card';
+import { Divider } from 'primereact/divider';
 
 interface NodeToolbarProps {
   onAddNode: (type: ControlType) => void;
 }
 
+const getNodeIcon = (type: ControlType | 'textAndDropdown') => {
+  switch(type) {
+    case 'text': return 'pi pi-pencil';
+    case 'textarea': return 'pi pi-align-left';
+    case 'dropdown': return 'pi pi-chevron-down';
+    case 'radio': return 'pi pi-circle-on';
+    case 'checkbox': return 'pi pi-check-square';
+    case 'textAndDropdown': return 'pi pi-list';
+    default: return 'pi pi-plus';
+  }
+};
+
 const NodeToolbar: React.FC<NodeToolbarProps> = ({ onAddNode }) => {
   const nodeTypes: (ControlType | 'textAndDropdown')[] = ['text', 'textarea', 'dropdown', 'radio', 'checkbox', 'textAndDropdown'];
 
   return (
-    <div className="w-48 bg-gray-200 p-4 border-r border-gray-300">
-      <h2 className="text-lg font-semibold mb-4">Add Node</h2>
-      <div className="space-y-2">
+    <Card className="node-toolbar p-shadow-2">
+      <div className="p-card-title">Add Node</div>
+      <Divider />
+      <div className="p-fluid p-grid p-formgrid">
         {nodeTypes.map((type) => (
-          <button
-            key={type}
-            onClick={() => onAddNode(type as ControlType)}
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-          >
-            {type === 'textAndDropdown' ? 'Text & Dropdown' : type.charAt(0).toUpperCase() + type.slice(1)}
-          </button>
+          <div key={type} className="p-field p-col-12 py-3">
+            <Button
+              className="p-button-outlined p-button-secondary"
+              icon={getNodeIcon(type)}
+              onClick={() => onAddNode(type as ControlType)}
+              label={type === 'textAndDropdown' ? 'Text & Dropdown' : type.charAt(0).toUpperCase() + type.slice(1)}
+            />
+          </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 };
 
